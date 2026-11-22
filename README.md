@@ -25,7 +25,7 @@ before you install anything.
   play single notes, several at once. Choose from 27 scales, chromatic included, starting on any note. Chord glide (off by default) slides
   each note into the next chord.
 - **Two layouts, each with a Lock mode.** In the Top layout, the upper row picks the chord type and the lower row the
-  root. In the Side layout, a few keys on the left pick the type and the rest play roots. Lock mode keeps the chord
+  root. In the Side layout, a few keys on the left pick the type and the rest play roots; the lowest key is HOLD. Lock mode keeps the chord
   type you tapped, so you don't have to hold its key. A new FM-1 starts in Top with Lock; without Lock, a chord
   plays only while you hold its key.
 - **A bass part under your chords** (you can turn it off), with its own sound and range, plus an octaver that doubles each bass note.

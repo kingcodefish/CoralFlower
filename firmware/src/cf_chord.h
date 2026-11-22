@@ -39,7 +39,7 @@ typedef struct {
     cf_form_t top[CF_TOP_NBTN]; /* the button whose form is Off (add CF_OFF_ADD) is HOLD since 0.5 (it was single notes,
                                  * which no button gives as well): never edited; the record keeps the Off form, so
                                  * 0.4.x reads it as before */
-    cf_form_t side[CF_SIDE_NBTN];
+    cf_form_t side[CF_SIDE_NBTN];  /* .. and Side's (the s2 key by default): HOLD as well */
 } cf_chord_cfg_t;
 
 typedef struct {

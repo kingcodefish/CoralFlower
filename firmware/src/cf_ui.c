@@ -153,11 +153,11 @@ static uint32_t env_part(void)
 #define CF_SAVE_NPG 3u
 static uint32_t cf_save_part(void) { return cu.page[SCR_SAVE] < CF_SAVE_NPG ? cu.page[SCR_SAVE] : 0u; }
 
-/* the first chord button SEL can edit: the first that is not Off (Side has no Off) */
+/* the first chord button SEL can edit: the first that is not Off */
 static uint8_t sel_first(void)
 {
-    uint8_t b = 0;
-    while (b + 1u < CF_TOP_NBTN && cf_is_off(&cs.chord, b))
+    uint8_t b = 0, nb = (cs.chord.algo == CF_ALG_TOP || cs.chord.algo == CF_ALG_TOP_LOCK) ? CF_TOP_NBTN : CF_SIDE_NBTN;
+    while (b + 1u < nb && cf_is_off(&cs.chord, b))
         b++;
     return b;
 }
@@ -168,7 +168,7 @@ static cf_form_t *sel_form(void)
     int top = cs.chord.algo == CF_ALG_TOP || cs.chord.algo == CF_ALG_TOP_LOCK;
     if (top)
         return &cs.chord.top[cu.sel_btn < CF_TOP_NBTN ? cu.sel_btn : sel_first()];
-    return &cs.chord.side[cu.sel_btn < CF_SIDE_NBTN ? cu.sel_btn : 0];
+    return &cs.chord.side[cu.sel_btn < CF_SIDE_NBTN ? cu.sel_btn : sel_first()];
 }
 
 static void ui_knob_info(int k, cf_knob_t *o)
@@ -763,7 +763,7 @@ static void ui_algo(int d)                       /* ALGORITHM: the chord algorit
             at++;
         cs.chord.algo = ORDER[clampi(at + d, 0, CF_NALGS - 1)];
     }
-    cu.sel_btn = cs.chord.algo >= CF_ALG_SIDE ? 0u : sel_first();
+    cu.sel_btn = sel_first();
     cf_send_config();
     cf_pop(POP_ALGO, 1400);
 }

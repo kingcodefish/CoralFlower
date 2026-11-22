@@ -84,18 +84,21 @@ const cf_form_t *cf_button_form(const cf_chord_cfg_t *cfg, int btn)
     return &cfg->side[btn >= 0 && btn < CF_SIDE_NBTN ? btn : 0];
 }
 
-/* Off is a form, not a place: the Top button that holds it is HOLD (since 0.5; it played single notes before),
- * wherever it is (the default puts it on the last upper key; a settings record from before keeps it on the first) */
+/* Off is a form, not a place: the button that holds it is HOLD (since 0.5; it played single notes before),
+ * wherever it is (Top: the default puts it on the last upper key, a settings record from before keeps it on the first;
+ * Side: on the s2 key, the first lower key, since this fork) */
 int cf_is_off(const cf_chord_cfg_t *cfg, int btn)
 {
-    return cfc_is_top(cfg->algo) && btn >= 0 && btn < CF_TOP_NBTN && cfg->top[btn].add == CF_OFF_ADD;
+    if (cfc_is_top(cfg->algo))
+        return btn >= 0 && btn < CF_TOP_NBTN && cfg->top[btn].add == CF_OFF_ADD;
+    return btn >= 0 && btn < CF_SIDE_NBTN && cfg->side[btn].add == CF_OFF_ADD;
 }
 
 static uint16_t cfc_off_mask(const cf_chord_cfg_t *cfg)
 {
     uint16_t m = 0;
-    int b;
-    for (b = 0; b < CF_TOP_NBTN; b++)
+    int b, nb = cfc_is_top(cfg->algo) ? CF_TOP_NBTN : CF_SIDE_NBTN;
+    for (b = 0; b < nb; b++)
         if (cf_is_off(cfg, b))
             m |= (uint16_t)(1u << b);
     return m;
@@ -113,8 +116,8 @@ void cf_chord_defaults(cf_chord_cfg_t *cfg)
     };
     static const cf_form_t SIDE[CF_SIDE_NBTN] = {
         {CF_T_MAJ, 0, 0, 0}, {CF_T_MIN, 0, 0, 0}, {CF_T_DIM, 0, 0, 0},
-        {CF_T_SUS2, 0, 0, 0}, {CF_T_SUS4, 0, 0, 0}, {CF_T_NONE, CF_A_b7, 0, 0}, {CF_T_NONE, CF_A_9, 0, 0},
-    };
+        {CF_T_NONE, CF_OFF_ADD, 0, 0}, {CF_T_SUS4, 0, 0, 0}, {CF_T_NONE, CF_A_b7, 0, 0}, {CF_T_NONE, CF_A_9, 0, 0},
+    };                                           /* (Side: HOLD on the s2 key, the first lower key) */
     int i;
     cfg->algo = CF_ALG_TOP_LOCK;                 /* (the first on the ALGORITHM knob: cf_ui.c) */
     cfg->quantize = CF_Q_BASIC;                  /* (a chord button plays its own type on any root; the owner, 2026-10-21:
@@ -268,7 +271,7 @@ static int cfc_resolve(cf_chord_t *c)
     if (!(c->keep && c->nroots && !c->bare && (!c->hold || cfc_any_down(c))))
         c->play = eff;                            /* (HOLD with no key down: a type tapped changes the held chord) */
     use = c->play;
-    off = cfc_is_top(g->algo) ? cfc_off_mask(g) : 0u;
+    off = cfc_off_mask(g);
     /* single notes: Off held, or no chord button at all (the owner's rule, 2026-10-15: keys alone play notes, as many
      * as are held; a chord sounds only while a chord button is down, or latched in Lock) */
     o.single = (uint8_t)((use & off) != 0 || use == 0);
@@ -367,7 +370,7 @@ void cf_chord_config(cf_chord_t *c, const cf_chord_cfg_t *cfg)
         c->held = c->gesture = c->locked = 0;
         c->toggle = 0;
         c->nroots = 0;
-        c->hold = 0;                              /* (Side has no HOLD key: nothing held over) */
+        c->hold = 0;                              /* (a new layout: nothing held over) */
     }
     c->cfg = *cfg;
     cfc_resolve(c);

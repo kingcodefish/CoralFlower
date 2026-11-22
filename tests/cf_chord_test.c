@@ -372,9 +372,43 @@ int main(void)
         cf_chord_cfg_t s = G;
         s.algo = CF_ALG_SIDE;
         cf_chord_config(&C, &s);
-        CHECK(!C.out.hold && !C.out.sounding, "Side chosen: HOLD off, nothing held over (Side has no HOLD key)");
+        CHECK(!C.out.hold && !C.out.sounding, "Side chosen: HOLD off, nothing held over");
         cf_chord_config(&C, &G);
     }
+
+    /* Side: HOLD on the s2 key (key 0, the first lower key), as in Top */
+    setup(CF_ALG_SIDE, CF_Q_BASIC, 0, CF_SC_MAJOR);
+    CHECK(cf_key_role(CF_ALG_SIDE, 0, &idx) == CF_ROLE_BUTTON && idx == 3 && cf_is_off(&G, 3), "Side: key 0 is HOLD");
+    CHECK(!cf_is_off(&G, 4) && G.side[4].type == CF_T_SUS4, "Side: s4 stays");
+    down(0);
+    up(0);
+    CHECK(C.out.hold && !C.out.buttons && !C.out.sounding, "Side: HOLD tapped, on; never a chord button");
+    down(3);
+    down(7);
+    up(7);
+    NOTES("Side: C let go under HOLD, m still down: C minor stays", 60, 63, 67);
+    up(3);
+    NOTES("Side (not Lock): m let go too: the held root alone, a single note", 60);
+    down(9);
+    up(9);
+    NOTES("Side: D pressed with none down replaces C", 62);
+    down(9);
+    down(12);
+    up(9);
+    up(12);
+    NOTES("Side: D and F pressed together under HOLD: both stay", 62, 65);
+    down(0);
+    up(0);
+    CHECK(!C.out.hold && !C.out.sounding, "Side: HOLD tapped again, everything let go");
+    setup(CF_ALG_SIDE_LOCK, CF_Q_BASIC, 0, CF_SC_MAJOR);
+    down(1);
+    up(1);
+    down(0);
+    up(0);
+    down(7);
+    up(7);
+    CHECK(C.out.hold && C.out.buttons == 1u << 0, "Side Lock: HOLD beside the latched M (%03x)", C.out.buttons);
+    NOTES("Side Lock: C under HOLD and M latched: C major", 60, 64, 67);
 
     /* the default order: M6 M7 M9 | s2 s4 | m6 m7 m9 | M m | Off, Off on the last upper key */
     cf_chord_defaults(&G);

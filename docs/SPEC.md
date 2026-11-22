@@ -88,7 +88,8 @@ the new one; a changed one stays as it is. The flow is like FoMni's chord select
 is chosen.
 
 **Algorithm 2 — Side.** Quality buttons on upper keys 1–3: `M  m  d`; extension buttons on lower keys
-1–4: `s2  s4  7  9`. All remaining keys play roots. Flow like FoMni's, but chord form *and* degrees are
+1–4: `HOLD  s4  7  9` (this fork: the s2 key is HOLD, as the Top layout's Off key; a settings record with no HOLD in
+Side gets it there). All remaining keys play roots. Flow like FoMni's, but chord form *and* degrees are
 chosen.
 
 **Combining.** Buttons pressed together add their degrees: M6 + M9 → M6/9. Sus buttons combine with major

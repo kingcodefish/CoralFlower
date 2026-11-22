@@ -91,6 +91,13 @@ static void cfs_sanitize(cf_set_t *s)
             for (i = 0; i < CF_TOP_NBTN; i++)
                 s->chord.top[i] = d.chord.top[i];
     }
+    {   /* Side gained HOLD (this fork): a record with no Off button in Side puts it on the s2 key, as the default */
+        uint32_t offs = 0;
+        for (i = 0; i < CF_SIDE_NBTN; i++)
+            offs += s->chord.side[i].add == CF_OFF_ADD;
+        if (!offs)
+            s->chord.side[3] = d.chord.side[3];
+    }
     if (s->glide_ms > 2000u) s->glide_ms = d.glide_ms;
     if (!s->vel || s->vel > 127u) s->vel = d.vel;
     if (s->bass_oct < -2 || s->bass_oct > 2) s->bass_oct = 0;
